@@ -35,12 +35,12 @@ void setup()
 
     bar1 = lv_bar_create(lv_screen_active());
     lv_obj_set_size(bar1, 150, 20);
-    lv_obj_align(bar1, LV_ALIGN_CENTER, 0, -110);
+    lv_obj_align(bar1, LV_ALIGN_CENTER, 0, -115);
     lv_bar_set_value(bar1, 50, LV_ANIM_ON);
 
     bar2 = lv_bar_create(lv_screen_active());
     lv_obj_set_size(bar2, 150, 20);
-    lv_obj_align(bar2, LV_ALIGN_CENTER, 0, -90);
+    lv_obj_align(bar2, LV_ALIGN_CENTER, 0, -85);
     lv_bar_set_value(bar2, 60, LV_ANIM_ON);
 
     lv_anim_t a;
