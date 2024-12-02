@@ -5,7 +5,7 @@
 TFT_eSPI tft = TFT_eSPI();     // Inicializa TFT_eSPI
 
 /*Set to your screen resolution and rotation*/
-#define TFT_ROTATION LV_DISPLAY_ROTATION_0
+#define TFT_ROTATION LV_DISPLAY_ROTATION_180
 
 /*LVGL draw into this buffer, 1/10 screen size usually works well. The size is in bytes*/
 #define DRAW_BUF_SIZE (TFT_HEIGHT * TFT_WIDTH / 10 * (LV_COLOR_DEPTH / 8))
@@ -20,7 +20,7 @@ static uint32_t my_tick(void)
 
 void setup()
 {
-    String LVGL_Arduino = "Hello @LabGluon! ";
+    String LVGL_Arduino = "Hello @Perico_197! ";
     LVGL_Arduino += String('V') + lv_version_major() + "." + lv_version_minor() + "." + lv_version_patch();
 
     Serial.begin(115200);

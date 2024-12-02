@@ -210,14 +210,15 @@
 // For ESP32 Dev board (only tested with ILI9341 display)
 // The hardware SPI can be mapped to any pins
 
-#define TFT_MISO 12
-#define TFT_MOSI 13
+#define TFT_MOSI 13 // In some display driver board, it might be written as "SDA" and so on.
 #define TFT_SCLK 14
-#define TFT_CS    15  // Chip select control pin
-#define TFT_DC    2  // Data Command control pin
-//#define TFT_RST   4  // Reset pin (could connect to RST pin)
-#define TFT_RST  -1  // Set TFT_RST to -1 if display RESET is connected to ESP32 board RST
-#define TFT_BL 21
+#define TFT_CS 15  // Chip select control pin
+#define TFT_DC 2   // Data Command control pin
+#define TFT_RST 12 // Reset pin (could connect to Arduino RESET pin)
+#define TFT_BL 21  // LED back-light
+#define TOUCH_CS 33
+#define TFT_BL 21             // LED back-light control pin
+#define TFT_BACKLIGHT_ON HIGH // Level to turn ON back-light (HIGH or LOW)
 // For ESP32 Dev board (only tested with GC9A01 display)
 // The hardware SPI can be mapped to any pins
 
