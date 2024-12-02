@@ -1,6 +1,6 @@
 # ST7789 + ESP32 + Platformio + LVGL
 
-This example use a 240x280 screen with an ESP32, using LVGL 9.2 and TFT_eSPI as the graphic driver.
+This example use a 240x320 screen with an ESP32, using LVGL 9.2 and TFT_eSPI as the graphic driver.
 
 ## Configuration
 
@@ -16,4 +16,4 @@ Compile and flash.
 
 If your display looks like the picture, you should lower your SPI speed in the `User_Setup.h` line 364, and uncomment a lower speed.
 
-![](doc/spi_too_fast_small.jpg)
+![](doc/IMG20241202194453 (1).jpg)
