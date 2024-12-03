@@ -1,6 +1,19 @@
 #include <Arduino.h>
 #include <lvgl.h>
 #include <TFT_eSPI.h>
+#include <XPT2046_Touchscreen.h>
+
+#define XPT2046_IRQ 36   // T_IRQ
+#define XPT2046_MOSI 32  // T_DIN
+#define XPT2046_MISO 39  // T_OUT
+#define XPT2046_CLK 25   // T_CLK
+#define XPT2046_CS 33    // T_CS
+
+SPIClass touchscreenSPI = SPIClass(VSPI);
+XPT2046_Touchscreen touchscreen(XPT2046_CS, XPT2046_IRQ);
+#define SCREEN_WIDTH 240
+#define SCREEN_HEIGHT 320
+int x, y, z;
 
 TFT_eSPI tft = TFT_eSPI();
 
@@ -37,7 +50,32 @@ void button_event_cb(lv_event_t *e)
         lv_obj_set_style_bg_color(button, lv_color_make(0, 0, 255), 0);
     }
 }
-
+void touchscreen_read(lv_indev_t * indev, lv_indev_data_t * data) {
+  // Checks if Touchscreen was touched, and prints X, Y and Pressure (Z)
+  if(touchscreen.tirqTouched() && touchscreen.touched()) {
+    // Get Touchscreen points
+    TS_Point p = touchscreen.getPoint();
+    // Calibrate Touchscreen points with map function to the correct width and height
+    x = map(p.x, 200, 3700, 1, SCREEN_WIDTH);
+    y = map(p.y, 240, 3800, 1, SCREEN_HEIGHT);
+    z = p.z;
+    data->state = LV_INDEV_STATE_PRESSED;
+    // Set the coordinates
+    data->point.x = x;
+    data->point.y = y;
+    // Print Touchscreen info about X, Y and Pressure (Z) on the Serial Monitor
+    /* Serial.print("X = ");
+    Serial.print(x);
+    Serial.print(" | Y = ");
+    Serial.print(y);
+    Serial.print(" | Pressure = ");
+    Serial.print(z);
+    Serial.println();*/
+  }
+  else {
+    data->state = LV_INDEV_STATE_RELEASED;
+  }
+}
 void setup()
 {
     Serial.begin(115200);
