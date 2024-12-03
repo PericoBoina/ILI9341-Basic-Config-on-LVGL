@@ -12,15 +12,16 @@ ser = serial.Serial(puerto, baud_rate)
 def enviar_dato(valor):
     ser.write(f"{valor}\n".encode())  # Enviar el valor como cadena seguida de salto de línea
     print(f"Enviado: {valor}")
-    time.sleep(0.5)  # Esperar medio segundo entre envíos
+    time.sleep(0.2)  # Esperar medio segundo entre envíos
 
-# Enviar valores ascendentes de 0 a 100 en saltos de 10
-for i in range(0, 101, 10):
-    enviar_dato(i)
+# Bucle infinito para enviar los valores
+while True:
 
-# Enviar valores descendentes de 100 a 0 en saltos de 10
-for i in range(100, -1, -10):
-    enviar_dato(i)
-
-# Cerrar el puerto serial
+    for i in range(0, 101, 10):
+        enviar_dato(i)
+    
+    for i in range(100, -1,-10):
+        enviar_dato(i)
+    
+# Cerrar el puerto serial (esto nunca se alcanzará en el bucle infinito)
 ser.close()

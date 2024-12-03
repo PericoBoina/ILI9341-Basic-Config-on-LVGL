@@ -33,23 +33,10 @@ lv_obj_t *button;
 lv_obj_t *btn_label; 
 
 #define GRAPH_HEIGHT 120
-#define GRAPH_POINTS 10
+#define GRAPH_POINTS 25
 int temperature_values[GRAPH_POINTS] = {0}; 
 
-void button_event_cb(lv_event_t *e)
-{
-    static bool toggled = false;
-    toggled = !toggled;
 
-    if (toggled)
-    {
-        lv_obj_set_style_bg_color(button, lv_color_make(0, 255, 0), 0); 
-    }
-    else
-    {
-        lv_obj_set_style_bg_color(button, lv_color_make(0, 0, 255), 0);
-    }
-}
 void touchscreen_read(lv_indev_t * indev, lv_indev_data_t * data) {
   // Checks if Touchscreen was touched, and prints X, Y and Pressure (Z)
   if(touchscreen.tirqTouched() && touchscreen.touched()) {
@@ -109,17 +96,15 @@ void setup()
 
     // Crear el botón
     button = lv_btn_create(lv_scr_act());
-    lv_obj_set_size(button, 100, 50); // Tamaño del botón
+    lv_obj_set_size(button, 150, 50); // Tamaño del botón
     lv_obj_align(button, LV_ALIGN_BOTTOM_MID, 0, -20); // Posición del botón
-    lv_obj_set_style_bg_color(button, lv_color_make(0, 0, 255), 0); // Color inicial azul
+    lv_obj_set_style_bg_color(button, lv_color_make(130, 0, 255), 0); // Color inicial azul
 
     // Crear etiqueta para el botón
     btn_label = lv_label_create(button);
-    lv_label_set_text(btn_label, "Cambiar Color");
+    lv_label_set_text(btn_label, "Press Me!");
     lv_obj_center(btn_label);
 
-    // Asignar callback al botón
-    lv_obj_add_event_cb(button, button_event_cb, LV_EVENT_CLICKED, NULL);
 }
 
 void loop()
