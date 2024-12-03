@@ -58,6 +58,6 @@ void setup()
 
 void loop()
 {
-    lv_timer_handler(); // Procesa tareas de LVGL
-    delay(5);  
+    lv_timer_handler(); 
+    delay(5);
 }
