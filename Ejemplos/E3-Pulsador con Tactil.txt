@@ -1,3 +1,7 @@
+// implementamos el driver tactil en lvgl 
+
+// creamos un pulsador el cual cuando es presionado devuelve un mensaje por serial 
+
 #include <Arduino.h>
 #include <SPI.h>
 #include <XPT2046_Touchscreen.h>

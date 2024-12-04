@@ -6,20 +6,20 @@
 
 TFT_eSPI tft = TFT_eSPI();
 
-// Definimos el tamaño del buffer de dibujo para la pantalla
+
 #define DRAW_BUF_SIZE (TFT_HEIGHT * TFT_WIDTH / 10 * (LV_COLOR_DEPTH / 8))
 uint32_t draw_buf[DRAW_BUF_SIZE / 4];
 
-// Inicializamos el touchscreen
+
 XPT2046_Touchscreen touchscreen(TOUCH_CS, TOUCH_IRQ);
 
-// Función para obtener el tick
+
 static uint32_t my_tick(void)
 {
   return millis();
 }
 
-// Declaramos las variables de los botones
+
 lv_obj_t *button;
 lv_obj_t *label_0;
 
@@ -27,38 +27,26 @@ void your_indev_read_cb(lv_indev_t *indev, lv_indev_data_t *indevData)
 {
   if (touchscreen.touched())
   {
-    // Si hay una pulsación en la pantalla táctil
-    TS_Point p = touchscreen.getPoint(); // Lee las coordenadas X e Y
+    TS_Point p = touchscreen.getPoint();
 
-    // Convertir las coordenadas a las dimensiones de la pantalla
     indevData->point.x = map(p.x, 230, 3920, 1, TFT_WIDTH);
     indevData->point.y = map(p.y, 400, 3905, 1, TFT_HEIGHT);
 
     indevData->state = LV_INDEV_STATE_PRESSED;
-
-    /*Serial.print("X = ");
-    Serial.print(p.x);
-    Serial.print(" | Y = ");
-    Serial.print(p.y);
-    Serial.print(" | Pressure = ");
-    Serial.print(p.z);
-    Serial.println();*/
   }
   else
   {
-    indevData->state = LV_INDEV_STATE_RELEASED; // No hay presión
+    indevData->state = LV_INDEV_STATE_RELEASED;
   }
 }
-
-
 
 static void btn_event_cb(lv_event_t *e)
 {
   lv_obj_t *btn = (lv_obj_t *)lv_event_get_target(e);
   if (lv_event_get_code(e) == LV_EVENT_CLICKED)
   {
-    // Cuando se hace clic en el botón, se imprime en el puerto serial
-    Serial.println("¡Botón tocado!");
+
+    Serial.println("¡Botón Presionado!");
   }
 }
 
@@ -72,36 +60,30 @@ void setup()
     ;
   Serial.println("Touchscreen listo");
 
-  // Inicializa LVGL
   lv_init();
   lv_tick_set_cb(my_tick);
 
-  // Configura la pantalla TFT con LVGL
   lv_display_t *disp = lv_tft_espi_create(TFT_WIDTH, TFT_HEIGHT, draw_buf, sizeof(draw_buf));
-  
+
   lv_obj_set_style_bg_color(lv_screen_active(), lv_color_make(0, 0, 0), 0);
-  // Crear un botón en la pantalla
+
   button = lv_button_create(lv_scr_act());
   lv_obj_align(button, LV_ALIGN_CENTER, 0, 0);
   lv_obj_set_size(button, 180, 50);
 
   // Crear la etiqueta dentro del botón
   label_0 = lv_label_create(button);
-  lv_label_set_text(label_0, "Toca aqui");
-  lv_obj_center(label_0); // Centrar la etiqueta en el botón
+  lv_label_set_text(label_0, "Prees Me!");
+  lv_obj_center(label_0); 
 
-  // Asociar un evento al botón: cuando se toque, imprimir en el puerto serial
+
    lv_obj_add_event_cb(button, btn_event_cb, LV_EVENT_CLICKED, NULL);
 
-  // Realizar la configuración del dispositivo de entrada táctil
   lv_indev_t *indev = lv_indev_create();
   lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);
-  lv_indev_set_read_cb(indev, your_indev_read_cb); // Callback para leer datos del touchscreen
+  lv_indev_set_read_cb(indev, your_indev_read_cb); 
 
 
-
-  // Configuración de calibración (esto es opcional, según tu necesidad)
-  // Aquí deberías integrar la calibración si es necesaria (dependiendo de tu configuración)
 }
 
 void loop()

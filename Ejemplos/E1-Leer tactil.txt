@@ -1,3 +1,8 @@
+// Este código configura y lee datos de un pantalla táctil XPT2046 usando la biblioteca SPI
+
+// Cuando se toca la pantalla, se leen las coordenadas X, Y y Z del punto tocado
+// y se muestran por el puerto serie 
+
 #include <Arduino.h>
 #include <SPI.h>
 #include <XPT2046_Touchscreen.h>
