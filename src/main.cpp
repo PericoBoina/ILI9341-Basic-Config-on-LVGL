@@ -3,14 +3,6 @@
 #include <TFT_eSPI.h>
 #include <XPT2046_Touchscreen.h>
 
-#define TFT_MISO 12
-#define TFT_MOSI 13
-#define TFT_SCLK 14
-#define TFT_CS 15
-#define TFT_DC 2
-#define TFT_RST -1
-#define TFT_BL 21
-#define TFT_BACKLIGHT_ON HIGH
 
 #define TOUCH_CS 33
 #define TOUCH_IRQ 36

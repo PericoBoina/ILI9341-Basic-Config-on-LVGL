@@ -1,0 +1,59 @@
+// Ejemplo solo lectura tactil //
+
+
+
+
+#include <Arduino.h>
+#include <SPI.h>
+#include <XPT2046_Touchscreen.h>
+#include <FS.h>
+#include "SPIFFS.h"
+
+#define TOUCH_CS_PIN 33
+#define TOUCH_IRQ_PIN 36
+#define TOUCH_MOSI_PIN 32
+#define TOUCH_MISO_PIN 39
+#define TOUCH_SCK_PIN 25
+
+XPT2046_Touchscreen touchscreen(TOUCH_CS_PIN, TOUCH_IRQ_PIN);
+
+// Variables para las coordenadas táctiles
+TS_Point touchPoint;
+
+void setup() {
+  // Iniciar la comunicación serial
+  Serial.begin(115200);
+  
+  // Iniciar el SPI para el touchscreen usando pines definidos
+  SPI.begin(TOUCH_SCK_PIN, TOUCH_MISO_PIN, TOUCH_MOSI_PIN, TOUCH_CS_PIN);
+  
+  // Iniciar el touchscreen
+  touchscreen.begin();
+  touchscreen.setRotation(1);  // Rotación del touchscreen si es necesario
+  
+  // Esperar a que el serial esté listo
+  while (!Serial);
+  Serial.println("Touchscreen listo. Tocando para leer datos...");
+}
+
+void loop() {
+  // Verificar si el touchscreen ha sido tocado
+  if (touchscreen.touched()) {
+    // Leer las coordenadas táctiles
+    touchPoint = touchscreen.getPoint();
+    
+    // Mostrar las coordenadas (X, Y) y la presión (Z)
+    Serial.print("X: ");
+    Serial.print(touchPoint.x);
+    Serial.print("  Y: ");
+    Serial.print(touchPoint.y);
+    Serial.print("  Z: ");
+    Serial.println(touchPoint.z);
+    
+    delay(500);  // Pausar un poco para que no se lea demasiado rápido
+  } else {
+    // Si no se está tocando, indicar que no hay contacto
+    Serial.println("No tocado");
+    delay(500);
+  }
+}
