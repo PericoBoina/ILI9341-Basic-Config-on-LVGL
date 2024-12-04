@@ -18,7 +18,7 @@ static uint32_t my_tick(void)
 lv_obj_t *graph;
 lv_chart_series_t *temp_series;
 lv_obj_t *temp_label;
-lv_obj_t *label;  
+lv_obj_t *label;  // Definición única para la etiqueta
 
 #define GRAPH_HEIGHT 120
 #define GRAPH_POINTS 10
@@ -34,12 +34,12 @@ void setup()
     // Establecer el fondo en negro
     lv_obj_set_style_bg_color(lv_scr_act(), lv_color_make(0, 0, 0), 0);
 
-
+    // Crear la etiqueta de saludo
     label = lv_label_create(lv_scr_act()); // Usar lv_scr_act() para la pantalla activa
     lv_label_set_text(label, "Temperatura en tiempo real");
     lv_obj_align(label, LV_ALIGN_TOP_MID, 0, 10); // Alineación mejorada
     // Cambiar el color del texto del primer label a blanco
-    lv_obj_set_style_text_color(label, lv_color_make(255, 0, 255), 0);
+    lv_obj_set_style_text_color(label, lv_color_make(255, 255, 255), 0);
 
     // Crear la gráfica para la temperatura
     graph = lv_chart_create(lv_scr_act());
