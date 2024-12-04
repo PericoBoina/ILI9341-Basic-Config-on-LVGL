@@ -999,7 +999,7 @@
 #endif
 
 /*Use Nuttx to open window and handle touchscreen*/
-#define LV_USE_NUTTX    0
+#define LV_USE_NUTTX   0
 
 #if LV_USE_NUTTX
     #define LV_USE_NUTTX_LIBUV    0
@@ -1015,7 +1015,7 @@
     #endif
 
     /*Driver for /dev/input*/
-    #define LV_USE_NUTTX_TOUCHSCREEN    0
+    #define LV_USE_NUTTX_TOUCHSCREEN    1
 
 #endif
 
