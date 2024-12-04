@@ -25,7 +25,7 @@ void setup() {
   Serial.begin(115200);
   
   // Iniciar el SPI para el touchscreen usando pines definidos
-  SPI.begin(TOUCH_SCK_PIN, TOUCH_MISO_PIN, TOUCH_MOSI_PIN, TOUCH_CS_PIN);
+    SPI.begin(TOUCH_SCK, TOUCH_MISO, TOUCH_MOSI, TOUCH_CS);
   
   // Iniciar el touchscreen
   touchscreen.begin();
