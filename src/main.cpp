@@ -1,3 +1,4 @@
+
 #include <Arduino.h>
 #include <SPI.h>
 #include <XPT2046_Touchscreen.h>
@@ -8,111 +9,208 @@
 
 TFT_eSPI tft = TFT_eSPI();
 
-#define DRAW_BUF_SIZE (TFT_WIDTH * 40) // Reducido a 40 filas
+#define DRAW_BUF_SIZE (TFT_WIDTH * 40)
 uint32_t draw_buf[DRAW_BUF_SIZE / 4];
 
 XPT2046_Touchscreen touchscreen(TOUCH_CS, TOUCH_IRQ);
 
 static uint32_t my_tick(void)
 {
-    return millis();
+  return millis();
 }
 
 lv_obj_t *button;
 lv_obj_t *button_1;
+lv_obj_t *button_2;
 lv_obj_t *label_0;
 lv_obj_t *label_1;
 lv_obj_t *label_2;
+lv_obj_t *label_3;
 
 const char txt_label_2[] PROGMEM = "Hi! @Perico_197 I'm LVGL";
 const char txt_button_0[] PROGMEM = "Pulsador 1";
 const char txt_button_1[] PROGMEM = "Pulsador 2";
+const char txt_button_2[] PROGMEM = "Pulsador 3";
+
+uint8_t broadcastAddress[] = {0xCC, 0x7B, 0x5C, 0xB8, 0xEC, 0xDC};
+
+
+// Estructura para enviar datos ESP-NOW
+typedef struct {
+  uint8_t button_id; // ID del botón presionado
+} ButtonMessage;
+
+ButtonMessage msg;
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
 void touchread(lv_indev_t *indev, lv_indev_data_t *indevData)
 {
-    if (touchscreen.touched())
-    {
-        TS_Point p = touchscreen.getPoint();
+  if (touchscreen.touched())
+  {
+    TS_Point p = touchscreen.getPoint();
 
-        indevData->point.x = map(p.x, 0, 4095, 0, TFT_WIDTH);
-        indevData->point.y = map(p.y, 0, 4095, 0, TFT_HEIGHT);
+    indevData->point.x = map(p.x, 0, 4095, 0, TFT_WIDTH);
+    indevData->point.y = map(p.y, 0, 4095, 0, TFT_HEIGHT);
 
-        indevData->state = LV_INDEV_STATE_PRESSED;
-    }
-    else
-    {
-        indevData->state = LV_INDEV_STATE_RELEASED;
-    }
+    indevData->state = LV_INDEV_STATE_PRESSED;
+  }
+  else
+  {
+    indevData->state = LV_INDEV_STATE_RELEASED;
+  }
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+bool estado_button = false;
+bool estado_button1 = false;
+bool estado_button2 = false;
+
+// Función para enviar datos por ESP-NOW
+void sendButtonData(uint8_t button_id)
+{
+  msg.button_id = button_id;
+  esp_err_t result = esp_now_send(NULL, (uint8_t *)&msg, sizeof(msg)); // NULL envía a todos los pares registrados
+  if (result == ESP_OK)
+  {
+    Serial.print("Enviado correctamente: ");
+    Serial.println(button_id);
+  }
+  else
+  {
+    Serial.println("Error al enviar");
+  }
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
 static void button_event(lv_event_t *e)
 {
-  lv_obj_t *button = (lv_obj_t *)lv_event_get_target(e);
-  if (lv_event_get_code(e) == LV_EVENT_CLICKED)
+  if (lv_event_get_code(e) == LV_EVENT_PRESSED && !estado_button)
   {
-    Serial.println("1");
+    estado_button = true;
+    Serial.println('1');
+    sendButtonData(1); // Enviar datos del botón 1
+  }
+  else if (lv_event_get_code(e) == LV_EVENT_RELEASED)
+  {
+    estado_button = false;
   }
 }
 
 static void button1_event(lv_event_t *e)
 {
-  lv_obj_t *button_1 = (lv_obj_t *)lv_event_get_target(e);
-  if (lv_event_get_code(e) == LV_EVENT_CLICKED)
+  if (lv_event_get_code(e) == LV_EVENT_PRESSED && !estado_button1)
   {
-    Serial.println("2");
+    estado_button1 = true;
+    Serial.println('2');
+    sendButtonData(2); // Enviar datos del botón 2
+  }
+  else if (lv_event_get_code(e) == LV_EVENT_RELEASED)
+  {
+    estado_button1 = false;
   }
 }
 
+static void button2_event(lv_event_t *e)
+{
+  if (lv_event_get_code(e) == LV_EVENT_PRESSED && !estado_button2)
+  {
+    estado_button2 = true;
+    Serial.println('3');
+    sendButtonData(3); // Enviar datos del botón 3
+  }
+  else if (lv_event_get_code(e) == LV_EVENT_RELEASED)
+  {
+    estado_button2 = false;
+  }
+}
+
+/////////////////////////////////////// SETUP ////////////////////////////////////////////////
+
 void setup()
 {
-    Serial.begin(115200);
-    SPI.begin(TOUCH_SCK, TOUCH_MISO, TOUCH_MOSI, TOUCH_CS);
-    touchscreen.begin();
-    touchscreen.setRotation(0);
+  Serial.begin(115200);
+  SPI.begin(TOUCH_SCK, TOUCH_MISO, TOUCH_MOSI, TOUCH_CS);
 
-    WiFi.mode(WIFI_STA);
+  touchscreen.begin();
+  touchscreen.setRotation(0);
 
-    if (esp_now_init() != ESP_OK)
-    {
-        Serial.println("Error al inicializar ESP-NOW");
-        return;
-    }
+  WiFi.mode(WIFI_STA);
 
-    lv_init();
-    lv_tick_set_cb(my_tick);
+  if (esp_now_init() != ESP_OK)
+  {
+    Serial.println("Error al inicializar ESP-NOW");
+    return;
+  }
 
-    lv_display_t *disp = lv_tft_espi_create(TFT_WIDTH, TFT_HEIGHT, draw_buf, sizeof(draw_buf));
-    lv_obj_set_style_bg_color(lv_screen_active(), lv_color_white(), 0);
+  // Configurar ESP-NOW (pares si es necesario)
+  esp_now_peer_info_t peerInfo = {};
+  memcpy(peerInfo.peer_addr, broadcastAddress, 6); // Dirección MAC del receptor
+  peerInfo.channel = 0;
+  peerInfo.encrypt = false;
 
-    button = lv_button_create(lv_scr_act());
-    lv_obj_align(button, LV_ALIGN_TOP_MID, 0, 30);
-    lv_obj_set_size(button, 180, 50);
-    lv_obj_add_event_cb(button, button_event, LV_EVENT_CLICKED, NULL);
+  if (esp_now_add_peer(&peerInfo) != ESP_OK)
+  {
+    Serial.println("Error al agregar peer");
+    return;
+  }
 
-    button_1 = lv_button_create(lv_scr_act());
-    lv_obj_align(button_1, LV_ALIGN_TOP_MID, 0, 90);
-    lv_obj_set_size(button_1, 180, 50);
-    lv_obj_add_event_cb(button_1, button1_event, LV_EVENT_CLICKED, NULL);
+  lv_init();
+  lv_tick_set_cb(my_tick);
 
-    label_2 = lv_label_create(lv_screen_active());
-    lv_label_set_text_static(label_2, txt_label_2);
-    lv_obj_align(label_2, LV_ALIGN_TOP_MID, 0, 5);
+  lv_display_t *disp = lv_tft_espi_create(TFT_WIDTH, TFT_HEIGHT, draw_buf, sizeof(draw_buf));
+  lv_obj_set_style_bg_color(lv_screen_active(), lv_color_white(), 0);
 
-    label_0 = lv_label_create(button);
-    lv_label_set_text_static(label_0, txt_button_0);
-    lv_obj_center(label_0);
+  button = lv_button_create(lv_scr_act());
+  lv_obj_align(button, LV_ALIGN_TOP_MID, 0, 30);
+  lv_obj_set_size(button, 180, 50);
 
-    label_1 = lv_label_create(button_1);
-    lv_label_set_text_static(label_1, txt_button_1);
-    lv_obj_center(label_1);
+  button_1 = lv_button_create(lv_scr_act());
+  lv_obj_align(button_1, LV_ALIGN_TOP_MID, 0, 90);
+  lv_obj_set_size(button_1, 180, 50);
 
-    lv_indev_t *indev = lv_indev_create();
-    lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);
-    lv_indev_set_read_cb(indev, touchread);
+  button_2 = lv_button_create(lv_scr_act());
+  lv_obj_align(button_2, LV_ALIGN_TOP_MID, 0, 150);
+  lv_obj_set_size(button_2, 180, 50);
+
+  label_0 = lv_label_create(button);
+  lv_label_set_text_static(label_0, txt_button_0);
+  lv_obj_center(label_0);
+  lv_obj_set_style_text_color(label_0, lv_color_make(0, 0, 0), 0);
+
+  label_1 = lv_label_create(button_1);
+  lv_label_set_text_static(label_1, txt_button_1);
+  lv_obj_center(label_1);
+  lv_obj_set_style_text_color(label_1, lv_color_make(0, 0, 0), 0);
+
+  label_2 = lv_label_create(lv_screen_active());
+  lv_label_set_text_static(label_2, txt_label_2);
+  lv_obj_align(label_2, LV_ALIGN_TOP_MID, 0, 5);
+  lv_obj_set_style_text_color(label_2, lv_color_make(0, 0, 0), 0);
+
+  label_3 = lv_label_create(button_2);
+  lv_label_set_text_static(label_3, txt_button_2);
+  lv_obj_center(label_3);
+  lv_obj_set_style_text_color(label_3, lv_color_make(0, 0, 0), 0);
+
+  lv_obj_add_event_cb(button, button_event, LV_EVENT_PRESSED, NULL);
+  lv_obj_add_event_cb(button_1, button1_event, LV_EVENT_PRESSED, NULL);
+  lv_obj_add_event_cb(button_2, button2_event, LV_EVENT_PRESSED, NULL);
+  lv_obj_add_event_cb(button, button_event, LV_EVENT_RELEASED, NULL);
+  lv_obj_add_event_cb(button_1, button1_event, LV_EVENT_RELEASED, NULL);
+  lv_obj_add_event_cb(button_2, button2_event, LV_EVENT_RELEASED, NULL);
+
+  lv_indev_t *indev = lv_indev_create();
+  lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);
+  lv_indev_set_read_cb(indev, touchread);
 }
+
+/////////////////////////////////////////////// LOOP ////////////////////////////////////////////////
 
 void loop()
 {
-    lv_task_handler();
-    delay(5);
+  lv_task_handler();
+  delay(5);
 }
