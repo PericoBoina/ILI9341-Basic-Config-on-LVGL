@@ -1,0 +1,6 @@
+# Name,   Type, SubType, Offset,   Size
+# Nota: Todas las unidades en hexadecimal.
+
+nvs,      data, nvs,     0x9000,   0x4000   
+app0,     app,  factory, 0x10000,  0x300000 
+spiffs,   data, spiffs,  0x310000, 0x0EF000 
