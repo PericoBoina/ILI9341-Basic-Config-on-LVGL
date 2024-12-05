@@ -214,3 +214,61 @@ void loop()
   lv_task_handler();
   delay(5);
 }
+
+
+//////////////////////////////////// CODIGO DEL RECEPTOR ////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include <Arduino.h>
+#include <esp_now.h>
+#include <WiFi.h>
+
+// Estructura para recibir datos ESP-NOW
+typedef struct {
+  uint8_t button_id;  // ID del botón presionado
+} ButtonMessage;
+
+ButtonMessage msg;
+
+// Función que maneja la recepción de datos
+void onDataRecv(const uint8_t *mac, const uint8_t *data, int len) {
+  memcpy(&msg, data, sizeof(msg));  // Copiar los datos recibidos en la estructura msg
+  
+  // Imprimir el ID del botón recibido
+  Serial.print("Recibido el botón con ID: ");
+  Serial.println(msg.button_id);
+}
+
+void setup() {
+  Serial.begin(115200);
+
+  // Configurar Wi-Fi en modo estación (no se conecta a una red, solo se utiliza para ESP-NOW)
+  WiFi.mode(WIFI_STA);
+
+  // Inicializar ESP-NOW
+  if (esp_now_init() != ESP_OK) {
+    Serial.println("Error al inicializar ESP-NOW");
+    return;
+  }
+
+  // Configurar la función de callback para recibir datos
+  esp_now_register_recv_cb(onDataRecv);
+
+  // Agregar un peer sin especificar MAC (para recibir datos de cualquier dispositivo)
+  esp_now_peer_info_t peerInfo = {};
+  peerInfo.channel = 0;
+  peerInfo.encrypt = false;
+
+  if (esp_now_add_peer(&peerInfo) != ESP_OK) {
+    Serial.println("Error al agregar el peer");
+    return;
+  }
+
+  Serial.println("Receptor listo, esperando datos...");
+}
+
+void loop() {
+  // Aquí puedes agregar cualquier lógica adicional que necesites, por ejemplo, encender un LED cuando se recibe un botón.
+  delay(100);
+}
