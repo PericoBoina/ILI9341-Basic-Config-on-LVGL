@@ -19,11 +19,15 @@ static uint32_t my_tick(void)
   return millis();
 }
 
-
 lv_obj_t *button;
 lv_obj_t *button_1;
 lv_obj_t *label_0;
 lv_obj_t *label_1;
+lv_obj_t *label_2;
+lv_obj_t *scale;
+lv_obj_t *needle;
+
+////////////////////// leer el touchpad ///////////////////////////
 
 void touchread(lv_indev_t *indev, lv_indev_data_t *indevData)
 {
@@ -41,6 +45,7 @@ void touchread(lv_indev_t *indev, lv_indev_data_t *indevData)
     indevData->state = LV_INDEV_STATE_RELEASED;
   }
 }
+///////////////////////////////////////////////////////////////////
 
 static void button_event(lv_event_t *e)
 {
@@ -75,15 +80,30 @@ void setup()
 
   lv_display_t *disp = lv_tft_espi_create(TFT_WIDTH, TFT_HEIGHT, draw_buf, sizeof(draw_buf));
 
-  lv_obj_set_style_bg_color(lv_screen_active(), lv_color_make(0, 0, 0), 0);
+  lv_obj_set_style_bg_color(lv_screen_active(), lv_color_make(255, 255, 255), 0);
 
   button = lv_button_create(lv_scr_act());
-  lv_obj_align(button, LV_ALIGN_TOP_MID, 0, 20);
+  lv_obj_align(button, LV_ALIGN_TOP_MID, 0, 30);
   lv_obj_set_size(button, 180, 50);
+  lv_obj_set_style_bg_color(button, lv_color_make(0, 50, 180), 0);
+  lv_obj_set_style_bg_opa(button, LV_OPA_COVER, 0);
+  lv_obj_set_style_border_color(button, lv_color_make(0, 0, 0), 0);
+  lv_obj_set_style_border_width(button, 5, 0);
 
- button_1 = lv_button_create(lv_scr_act());
-  lv_obj_align(button_1, LV_ALIGN_CENTER, 0, -40);
+  button_1 = lv_button_create(lv_scr_act());
+  lv_obj_align(button_1, LV_ALIGN_TOP_MID, 0, 90);
   lv_obj_set_size(button_1, 180, 50);
+  // Cambiar el color de fondo del botón
+  lv_obj_set_style_bg_color(button_1, lv_color_make(0, 50, 180), 0);
+  lv_obj_set_style_bg_opa(button_1, LV_OPA_COVER, 0); // Hacer el fondo opaco
+  // Cambiar el color del borde a lila
+  lv_obj_set_style_border_color(button_1, lv_color_make(0, 0, 0), 0);
+  lv_obj_set_style_border_width(button_1, 5, 0); // Ancho del borde
+
+  label_2 = lv_label_create(lv_screen_active());
+  lv_label_set_text(label_2, "Hi! @Perico_197 I'm LVGL");
+  lv_obj_align(label_2, LV_ALIGN_TOP_MID, 0, 5);
+  lv_obj_set_style_text_color(label_2, lv_color_make(160, 0, 80), 0);
 
   label_0 = lv_label_create(button);
   lv_label_set_text(label_0, "Pulsador 1");
@@ -95,7 +115,14 @@ void setup()
   lv_obj_center(label_1);
   lv_obj_set_style_text_color(label_1, lv_color_make(0, 0, 0), 0);
 
- //  agregar cada evento a su boyon
+  scale = lv_scale_create(lv_screen_active());
+  lv_scale_set_mode(scale, LV_SCALE_MODE_ROUND_INNER);
+  lv_obj_set_style_bg_opa(scale, LV_OPA_COVER, 0);
+  lv_obj_set_style_bg_color(scale, lv_palette_lighten(LV_PALETTE_RED, 5), 0);
+  lv_obj_set_style_radius(scale, LV_RADIUS_CIRCLE, 0);
+  lv_obj_align(scale, LV_ALIGN_TOP_MID, 0, 175);
+
+  //  agregar cada evento a su pulsador
 
   lv_obj_add_event_cb(button, button_event, LV_EVENT_CLICKED, NULL);
   lv_obj_add_event_cb(button_1, button1_event, LV_EVENT_CLICKED, NULL);
