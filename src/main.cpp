@@ -118,7 +118,7 @@ void setup()
   scale = lv_scale_create(lv_screen_active());
   lv_scale_set_mode(scale, LV_SCALE_MODE_ROUND_INNER);
   lv_obj_set_style_bg_opa(scale, LV_OPA_COVER, 0);
-  lv_obj_set_style_bg_color(scale, lv_palette_lighten(LV_PALETTE_RED, 5), 0);
+  lv_obj_set_style_bg_color(scale, lv_palette_lighten(LV_PALETTE_ORANGE, 1), 0);
   lv_obj_set_style_radius(scale, LV_RADIUS_CIRCLE, 0);
   lv_obj_align(scale, LV_ALIGN_TOP_MID, 0, 175);
 
