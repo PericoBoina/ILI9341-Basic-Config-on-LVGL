@@ -3,6 +3,8 @@
 #include <XPT2046_Touchscreen.h>
 #include <lvgl.h>
 #include <TFT_eSPI.h>
+#include <esp_now.h>
+#include <WiFi.h>
 
 TFT_eSPI tft = TFT_eSPI();
 
@@ -71,6 +73,13 @@ void setup()
   SPI.begin(TOUCH_SCK, TOUCH_MISO, TOUCH_MOSI, TOUCH_CS);
   touchscreen.begin();
   touchscreen.setRotation(0);
+   WiFi.mode(WIFI_STA);
+
+  if (esp_now_init() != ESP_OK) {
+    Serial.println("Error al inicializar ESP-NOW");
+    return;
+  }
+
   while (!Serial)
     ;
   Serial.println("Touchscreen listo");
