@@ -109,7 +109,7 @@ static void button1_event(lv_event_t *e)
   {
     estado_button1 = true;
     Serial.println('2');
-    sendButtonData(2); // Enviar datos del botón 2
+    sendButtonData(2); 
   }
   else if (lv_event_get_code(e) == LV_EVENT_RELEASED)
   {
@@ -123,7 +123,7 @@ static void button2_event(lv_event_t *e)
   {
     estado_button2 = true;
     Serial.println('3');
-    sendButtonData(3); // Enviar datos del botón 3
+    sendButtonData(3);
   }
   else if (lv_event_get_code(e) == LV_EVENT_RELEASED)
   {
@@ -137,7 +137,7 @@ static void button3_event(lv_event_t *e)
   {
     estado_button3 = true;
     Serial.println('4');
-    sendButtonData(4); 
+    sendButtonData(4);
   }
   else if (lv_event_get_code(e) == LV_EVENT_RELEASED)
   {
@@ -217,7 +217,7 @@ void setup()
   lv_obj_center(label_3);
   lv_obj_set_style_text_color(label_3, lv_color_make(0, 0, 0), 0);
 
-    label_4 = lv_label_create(button_3);
+  label_4 = lv_label_create(button_3);
   lv_label_set_text_static(label_4, txt_button_3);
   lv_obj_center(label_4);
   lv_obj_set_style_text_color(label_4, lv_color_make(0, 0, 0), 0);
