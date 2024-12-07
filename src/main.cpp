@@ -19,12 +19,11 @@ static uint32_t my_tick(void)
 static lv_obj_t *slider_label;
 static lv_obj_t *slider_label1;
 static lv_obj_t *slider_label2;
+static lv_obj_t *static_label;
+
 static void slider_event_cb(lv_event_t *e);
 static void slider1_event_cb(lv_event_t *e);
 static void slider2_event_cb(lv_event_t *e);
-static lv_obj_t *moving_label;
-static int label_x = TFT_WIDTH;
-static bool moving_right = false;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -49,7 +48,7 @@ void touchread(lv_indev_t *indev, lv_indev_data_t *indevData)
 
 static void slider_event_cb(lv_event_t *e)
 {
-  lv_obj_t *slider = (lv_obj_t *)lv_event_get_target(e); 
+  lv_obj_t *slider = (lv_obj_t *)lv_event_get_target(e); // Conversión explícita
   char buf[8];
   lv_snprintf(buf, sizeof(buf), "%d%%", (int)lv_slider_get_value(slider));
   lv_label_set_text(slider_label, buf);
@@ -58,7 +57,7 @@ static void slider_event_cb(lv_event_t *e)
 
 static void slider1_event_cb(lv_event_t *e)
 {
-  lv_obj_t *slider1 = (lv_obj_t *)lv_event_get_target(e); 
+  lv_obj_t *slider1 = (lv_obj_t *)lv_event_get_target(e); // Conversión explícita
   char buf[8];
   lv_snprintf(buf, sizeof(buf), "%d%%", (int)lv_slider_get_value(slider1));
   lv_label_set_text(slider_label1, buf);
@@ -67,7 +66,7 @@ static void slider1_event_cb(lv_event_t *e)
 
 static void slider2_event_cb(lv_event_t *e)
 {
-  lv_obj_t *slider2 = (lv_obj_t *)lv_event_get_target(e); 
+  lv_obj_t *slider2 = (lv_obj_t *)lv_event_get_target(e); // Conversión explícita
   char buf[8];
   lv_snprintf(buf, sizeof(buf), "%d%%", (int)lv_slider_get_value(slider2));
   lv_label_set_text(slider_label2, buf);
@@ -90,22 +89,22 @@ void setup()
   lv_display_t *disp = lv_tft_espi_create(TFT_WIDTH, TFT_HEIGHT, draw_buf, sizeof(draw_buf));
   lv_obj_set_style_bg_color(lv_screen_active(), lv_color_black(), 0);
 
-   ///////////////////// Slider 1 //////////////////////////
+  ///////////////////// Slider 1 //////////////////////////
   lv_obj_t *slider = lv_slider_create(lv_screen_active());
-  lv_obj_align(slider, LV_ALIGN_TOP_LEFT, 20, 40); // Alineado a 20px desde la izquierda y 40px desde arriba
+  lv_obj_align(slider, LV_ALIGN_TOP_LEFT, 20, 40); 
   lv_obj_set_width(slider, 150);
 
   slider_label = lv_label_create(lv_screen_active());
   lv_label_set_text(slider_label, "0%");
   lv_obj_align_to(slider_label, slider, LV_ALIGN_OUT_RIGHT_MID, 20, 0);
 
-  lv_obj_set_style_bg_color(slider, lv_color_make(255, 0, 0), 0);    
+  lv_obj_set_style_bg_color(slider, lv_color_make(0, 0, 255), 0);    
 
   lv_obj_add_event_cb(slider, slider_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
 
   ///////////////////// Slider 2 //////////////////////////
   lv_obj_t *slider1 = lv_slider_create(lv_screen_active());
-  lv_obj_align(slider1, LV_ALIGN_TOP_LEFT, 20, 40 + 30 + 20); // 30px debajo del primero (40+altura del slider+30)
+  lv_obj_align(slider1, LV_ALIGN_TOP_LEFT, 20, 40 + 30 + 20); 
   lv_obj_set_width(slider1, 150);
 
   slider_label1 = lv_label_create(lv_screen_active());
@@ -117,25 +116,24 @@ void setup()
   lv_obj_add_event_cb(slider1, slider1_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
 
   ///////////////////// Slider 3 //////////////////////////
-
   lv_obj_t *slider2 = lv_slider_create(lv_screen_active());
-  lv_obj_align(slider2, LV_ALIGN_TOP_LEFT, 20, 40 + 30 + 20 + 30 + 20); // 30px debajo del segundo (40 + 30 + 20 + 30)
+  lv_obj_align(slider2, LV_ALIGN_TOP_LEFT, 20, 40 + 30 + 20 + 30 + 20); 
   lv_obj_set_width(slider2, 150);
 
   slider_label2 = lv_label_create(lv_screen_active());
   lv_label_set_text(slider_label2, "0%");
   lv_obj_align_to(slider_label2, slider2, LV_ALIGN_OUT_RIGHT_MID, 20, 0);
 
-  lv_obj_set_style_bg_color(slider2, lv_color_make(0, 0, 255), 0);
+  lv_obj_set_style_bg_color(slider2, lv_color_make(255, 0, 0), 0);    
 
   lv_obj_add_event_cb(slider2, slider2_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
 
-  ///////////////////// Etiqueta en movimiento //////////////////////////
+  ///////////////////// Etiqueta estática en la parte inferior //////////////////////////
+  static_label = lv_label_create(lv_screen_active());
+  lv_label_set_text(static_label, "Hi! @Perico_197 I'm LVGL!");
+  lv_obj_align(static_label, LV_ALIGN_BOTTOM_MID, 0, -10); // Centrado en la parte inferior
 
-  moving_label = lv_label_create(lv_screen_active());
-  lv_label_set_text(moving_label, "I'm @Perico_197 in LVGL!");
-  lv_obj_align(moving_label, LV_ALIGN_BOTTOM_LEFT, 0, -10);
-
+  ///////////////////// Configurar entrada táctil //////////////////////////
   lv_indev_t *indev = lv_indev_create();
   lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);
   lv_indev_set_read_cb(indev, touchread);
@@ -146,18 +144,5 @@ void setup()
 void loop()
 {
   lv_task_handler();
- if (moving_right) {
-    label_x += 1;  // Mover hacia la derecha
-    if (label_x + lv_obj_get_width(moving_label) >= 235) {  // Si ha llegado al borde derecho
-      moving_right = false;  // Cambiar dirección
-    }
-  } else {
-    label_x -= 1;  // Mover hacia la izquierda
-    if (label_x <= 0) {  // Si ha llegado al borde izquierdo
-      moving_right = true;  // Cambiar dirección
-    }
-  }
-
-  lv_obj_set_x(moving_label, label_x); 
   delay(5);
 }
