@@ -22,22 +22,25 @@ static uint32_t my_tick(void)
 lv_obj_t *button;
 lv_obj_t *button_1;
 lv_obj_t *button_2;
+lv_obj_t *button_3;
 lv_obj_t *label_0;
 lv_obj_t *label_1;
 lv_obj_t *label_2;
 lv_obj_t *label_3;
+lv_obj_t *label_4;
 
 const char txt_label_2[] PROGMEM = "Hi! @Perico_197 I'm LVGL";
-const char txt_button_0[] PROGMEM = "Pulsador 1";
-const char txt_button_1[] PROGMEM = "Pulsador 2";
-const char txt_button_2[] PROGMEM = "Pulsador 3";
+const char txt_button_0[] PROGMEM = "Rojo";
+const char txt_button_1[] PROGMEM = "Verde";
+const char txt_button_2[] PROGMEM = "Azul";
+const char txt_button_3[] PROGMEM = "Apagar";
 
-uint8_t broadcastAddress[] = {0xCC, 0x7B, 0x5C, 0xB8, 0xEC, 0xDC};
+uint8_t broadcastAddress[] = {0xCC, 0x7B, 0x5C, 0xB8, 0xEC, 0xDC}; // MAC Receptor ESP-NOW
 
 
-// Estructura para enviar datos ESP-NOW
+
 typedef struct {
-  uint8_t button_id; // ID del botón presionado
+  uint8_t button_id; 
 } ButtonMessage;
 
 ButtonMessage msg;
@@ -66,6 +69,7 @@ void touchread(lv_indev_t *indev, lv_indev_data_t *indevData)
 bool estado_button = false;
 bool estado_button1 = false;
 bool estado_button2 = false;
+bool estado_button3 = false;
 
 // Función para enviar datos por ESP-NOW
 void sendButtonData(uint8_t button_id)
@@ -105,7 +109,7 @@ static void button1_event(lv_event_t *e)
   {
     estado_button1 = true;
     Serial.println('2');
-    sendButtonData(2); // Enviar datos del botón 2
+    sendButtonData(2); 
   }
   else if (lv_event_get_code(e) == LV_EVENT_RELEASED)
   {
@@ -119,11 +123,25 @@ static void button2_event(lv_event_t *e)
   {
     estado_button2 = true;
     Serial.println('3');
-    sendButtonData(3); // Enviar datos del botón 3
+    sendButtonData(3);
   }
   else if (lv_event_get_code(e) == LV_EVENT_RELEASED)
   {
     estado_button2 = false;
+  }
+}
+
+static void button3_event(lv_event_t *e)
+{
+  if (lv_event_get_code(e) == LV_EVENT_PRESSED && !estado_button2)
+  {
+    estado_button3 = true;
+    Serial.println('4');
+    sendButtonData(4);
+  }
+  else if (lv_event_get_code(e) == LV_EVENT_RELEASED)
+  {
+    estado_button3 = false;
   }
 }
 
@@ -161,19 +179,23 @@ void setup()
   lv_tick_set_cb(my_tick);
 
   lv_display_t *disp = lv_tft_espi_create(TFT_WIDTH, TFT_HEIGHT, draw_buf, sizeof(draw_buf));
-  lv_obj_set_style_bg_color(lv_screen_active(), lv_color_white(), 0);
+  lv_obj_set_style_bg_color(lv_screen_active(), lv_color_black(), 0);
 
   button = lv_button_create(lv_scr_act());
-  lv_obj_align(button, LV_ALIGN_TOP_MID, 0, 30);
+  lv_obj_align(button, LV_ALIGN_TOP_MID, 0, 50);
   lv_obj_set_size(button, 180, 50);
 
   button_1 = lv_button_create(lv_scr_act());
-  lv_obj_align(button_1, LV_ALIGN_TOP_MID, 0, 90);
+  lv_obj_align(button_1, LV_ALIGN_TOP_MID, 0, 110);
   lv_obj_set_size(button_1, 180, 50);
 
   button_2 = lv_button_create(lv_scr_act());
-  lv_obj_align(button_2, LV_ALIGN_TOP_MID, 0, 150);
+  lv_obj_align(button_2, LV_ALIGN_TOP_MID, 0, 170);
   lv_obj_set_size(button_2, 180, 50);
+
+  button_3 = lv_button_create(lv_scr_act());
+  lv_obj_align(button_3, LV_ALIGN_TOP_MID, 0, 230);
+  lv_obj_set_size(button_3, 180, 50);
 
   label_0 = lv_label_create(button);
   lv_label_set_text_static(label_0, txt_button_0);
@@ -187,13 +209,18 @@ void setup()
 
   label_2 = lv_label_create(lv_screen_active());
   lv_label_set_text_static(label_2, txt_label_2);
-  lv_obj_align(label_2, LV_ALIGN_TOP_MID, 0, 5);
-  lv_obj_set_style_text_color(label_2, lv_color_make(0, 0, 0), 0);
+  lv_obj_align(label_2, LV_ALIGN_TOP_MID, 0, 15);
+  lv_obj_set_style_text_color(label_2, lv_color_make(125, 0, 200), 0);
 
   label_3 = lv_label_create(button_2);
   lv_label_set_text_static(label_3, txt_button_2);
   lv_obj_center(label_3);
   lv_obj_set_style_text_color(label_3, lv_color_make(0, 0, 0), 0);
+
+  label_4 = lv_label_create(button_3);
+  lv_label_set_text_static(label_4, txt_button_3);
+  lv_obj_center(label_4);
+  lv_obj_set_style_text_color(label_4, lv_color_make(0, 0, 0), 0);
 
   lv_obj_add_event_cb(button, button_event, LV_EVENT_PRESSED, NULL);
   lv_obj_add_event_cb(button_1, button1_event, LV_EVENT_PRESSED, NULL);
@@ -201,6 +228,8 @@ void setup()
   lv_obj_add_event_cb(button, button_event, LV_EVENT_RELEASED, NULL);
   lv_obj_add_event_cb(button_1, button1_event, LV_EVENT_RELEASED, NULL);
   lv_obj_add_event_cb(button_2, button2_event, LV_EVENT_RELEASED, NULL);
+  lv_obj_add_event_cb(button_3, button3_event, LV_EVENT_PRESSED, NULL);
+  lv_obj_add_event_cb(button_3, button3_event, LV_EVENT_RELEASED, NULL);
 
   lv_indev_t *indev = lv_indev_create();
   lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);
@@ -213,62 +242,4 @@ void loop()
 {
   lv_task_handler();
   delay(5);
-}
-
-
-//////////////////////////////////// CODIGO DEL RECEPTOR ////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#include <Arduino.h>
-#include <esp_now.h>
-#include <WiFi.h>
-
-// Estructura para recibir datos ESP-NOW
-typedef struct {
-  uint8_t button_id;  // ID del botón presionado
-} ButtonMessage;
-
-ButtonMessage msg;
-
-// Función que maneja la recepción de datos
-void onDataRecv(const uint8_t *mac, const uint8_t *data, int len) {
-  memcpy(&msg, data, sizeof(msg));  // Copiar los datos recibidos en la estructura msg
-  
-  // Imprimir el ID del botón recibido
-  Serial.print("Recibido el botón con ID: ");
-  Serial.println(msg.button_id);
-}
-
-void setup() {
-  Serial.begin(115200);
-
-  // Configurar Wi-Fi en modo estación (no se conecta a una red, solo se utiliza para ESP-NOW)
-  WiFi.mode(WIFI_STA);
-
-  // Inicializar ESP-NOW
-  if (esp_now_init() != ESP_OK) {
-    Serial.println("Error al inicializar ESP-NOW");
-    return;
-  }
-
-  // Configurar la función de callback para recibir datos
-  esp_now_register_recv_cb(onDataRecv);
-
-  // Agregar un peer sin especificar MAC (para recibir datos de cualquier dispositivo)
-  esp_now_peer_info_t peerInfo = {};
-  peerInfo.channel = 0;
-  peerInfo.encrypt = false;
-
-  if (esp_now_add_peer(&peerInfo) != ESP_OK) {
-    Serial.println("Error al agregar el peer");
-    return;
-  }
-
-  Serial.println("Receptor listo, esperando datos...");
-}
-
-void loop() {
-  // Aquí puedes agregar cualquier lógica adicional que necesites, por ejemplo, encender un LED cuando se recibe un botón.
-  delay(100);
 }
