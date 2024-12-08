@@ -19,6 +19,8 @@ static uint32_t my_tick(void)
 static lv_obj_t *spinner;
 static lv_obj_t *switch_obj;
 static lv_obj_t *switch_label; 
+static lv_obj_t *roller_label; // Etiqueta para mostrar el valor del roller
+static lv_obj_t *roller;      // El componente roller
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -54,6 +56,13 @@ static void switch_event_cb(lv_event_t *e)
   }
 }
 
+static void roller_event_cb(lv_event_t *e)
+{
+  lv_obj_t *roller = (lv_obj_t *)lv_event_get_target(e); // Conversión explícita
+  char buf[4];
+  lv_roller_get_selected_str(roller, buf, sizeof(buf)); // Obtiene el texto seleccionado
+  lv_label_set_text(roller_label, buf); // Actualiza la etiqueta con el texto seleccionado
+}
 /////////////////////////////////////// SETUP ////////////////////////////////////////////////
 
 void setup()
@@ -94,8 +103,6 @@ void setup()
   lv_obj_align(switch_obj, LV_ALIGN_CENTER, 0, 70); 
   lv_obj_add_event_cb(switch_obj, switch_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
 
-  // Crear un nuevo estilo para la etiqueta del switch
-
   static lv_style_t style_label;
   lv_style_init(&style_label);
   lv_style_set_text_color(&style_label, lv_color_white());  
@@ -105,6 +112,19 @@ void setup()
   lv_label_set_text(switch_label, "OFF");
   lv_obj_add_style(switch_label, &style_label, 0); 
   lv_obj_align_to(switch_label, switch_obj, LV_ALIGN_OUT_BOTTOM_MID, 0, 10); 
+
+  ///////////////////// Roller y etiqueta //////////////////////////
+
+  roller = lv_roller_create(lv_screen_active());
+  lv_roller_set_options(roller, "0\n1\n2\n3\n4\n5\n6\n7\n8\n9", LV_ROLLER_MODE_NORMAL);
+  lv_roller_set_visible_row_count(roller, 3);
+  lv_obj_align(roller, LV_ALIGN_LEFT_MID, 0, -90); 
+  lv_obj_add_event_cb(roller, roller_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
+
+  roller_label = lv_label_create(lv_screen_active());
+  lv_label_set_text(roller_label, "0"); // Inicializa con "0"
+  lv_obj_add_style(roller_label, &style_label, 0); 
+  lv_obj_align_to(roller_label, roller, LV_ALIGN_OUT_BOTTOM_MID, 0, 10); 
 
   ///////////////////// Configurar entrada táctil //////////////////////////
 
