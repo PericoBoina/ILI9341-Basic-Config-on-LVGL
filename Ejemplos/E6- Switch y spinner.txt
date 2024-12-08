@@ -81,29 +81,12 @@ void setup()
 
   ///////////////////// Switch y etiqueta //////////////////////////
 
-  static lv_style_t style_switch;
-  lv_style_init(&style_switch);
-  lv_style_set_bg_color(&style_switch, lv_color_make(40, 40, 40));  
-  lv_style_set_bg_opa(&style_switch, LV_OPA_COVER); 
-  lv_style_set_border_color(&style_switch, lv_color_make(255, 255, 255)); 
-  lv_style_set_border_width(&style_switch, 2); 
-  lv_style_set_radius(&style_switch, 20); 
-
   switch_obj = lv_switch_create(lv_screen_active());
-  lv_obj_add_style(switch_obj, &style_switch, 0);  
   lv_obj_align(switch_obj, LV_ALIGN_CENTER, 0, 70); 
   lv_obj_add_event_cb(switch_obj, switch_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
 
-  // Crear un nuevo estilo para la etiqueta del switch
-
-  static lv_style_t style_label;
-  lv_style_init(&style_label);
-  lv_style_set_text_color(&style_label, lv_color_white());  
-  lv_style_set_text_font(&style_label, &lv_font_montserrat_14); 
-
   switch_label = lv_label_create(lv_screen_active());
   lv_label_set_text(switch_label, "OFF");
-  lv_obj_add_style(switch_label, &style_label, 0); 
   lv_obj_align_to(switch_label, switch_obj, LV_ALIGN_OUT_BOTTOM_MID, 0, 10); 
 
   ///////////////////// Configurar entrada táctil //////////////////////////
