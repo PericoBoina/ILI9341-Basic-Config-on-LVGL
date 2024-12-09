@@ -24,20 +24,17 @@ static lv_obj_t *btn_500;
 static lv_obj_t *btn_5000;
 static lv_obj_t *btn_50;
 
-int set_value = 500;  // Valor por defecto
+ int set_value = 500;
 
-// Función para actualizar el valor en pantalla
-void update_value_display() {
-  char buf[6];  // Buffer para el valor
-  snprintf(buf, sizeof(buf), "%d", set_value);  // Convierte el valor a string
-  lv_label_set_text(roller_label, buf);  // Actualiza el label con el valor
-
-  // Convierte el valor a un array de dígitos para los rollers
+void update_value_display()
+{
+  char buf[6];
+  snprintf(buf, sizeof(buf), "%d", set_value);
+  lv_label_set_text(roller_label, buf);
   char value_str[6];
   snprintf(value_str, sizeof(value_str), "%05d", set_value);
-
-  // Actualiza los rollers con los valores correspondientes
-  for (int i = 0; i < 5; i++) {
+  for (int i = 0; i < 5; i++)
+  {
     lv_roller_set_selected(roller[i], value_str[i] - '0', LV_ANIM_ON);
   }
 }
@@ -84,15 +81,13 @@ static void btn_send_event_cb(lv_event_t *e)
 {
   char buf[6];
   buf[5] = '\0';
-
   for (int i = 0; i < 5; i++)
   {
     char digit[2];
     lv_roller_get_selected_str(roller[i], digit, sizeof(digit));
     buf[i] = digit[0];
   }
-
-  Serial.print("Set: ");
+  Serial.print("Set value: ");
   Serial.println(buf);
 }
 
@@ -163,10 +158,10 @@ void setup()
       lv_roller_set_selected(roller[i], 0, LV_ANIM_OFF);
   }
 
-  // Etiqueta debajo de los rollers
   roller_label = lv_label_create(lv_screen_active());
-  lv_label_set_text(roller_label, "50000");
+  lv_label_set_text(roller_label, "500");
   lv_obj_align_to(roller_label, roller[2], LV_ALIGN_OUT_BOTTOM_MID, 0, 10);
+  lv_obj_set_style_text_color(roller_label, lv_color_make(255, 0, 128), 0);
 
   static lv_style_t style_label_black;
   lv_style_init(&style_label_black);
